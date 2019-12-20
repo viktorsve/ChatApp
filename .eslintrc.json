@@ -19,5 +19,9 @@
         "react"
     ],
     "rules": {
+        "comma-dangle": "off",
+        "arrow-parens": "off",
+        "react/jsx-filename-extension": "off",
+        "no-console": "off"
     }
 }
