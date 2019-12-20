@@ -12,16 +12,23 @@ class App extends Component {
       messages: []
     };
 
+    this.focusInput = this.focusInput.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   componentDidMount() {
+    this.focusInput();
+
     // fix this eslint error later, idk how though :)
 
     socket.on('message', message => {
       this.setState({ messages: [...this.state.messages, message] });
     });
+  }
+
+  focusInput() {
+    this.input.focus();
   }
 
   handleChange(e) {
@@ -40,17 +47,15 @@ class App extends Component {
     const { value, messages } = this.state;
 
     return (
-      <div className="App">
-        <div className="App-intro">
-          <p>socket.io test</p>
-          <form onSubmit={this.handleSubmit}>
-            <input type="text" value={value} onChange={this.handleChange} />
-            <input type="submit" />
-          </form>
-          <ul>
-            {messages.map((message) => (<li key={message.id}>{`${message.user_id}: ${message.value}`}</li>))}
-          </ul>
-        </div>
+      <div className="App" onClick={this.focusInput}>
+        <ul>
+          {messages.map((message) => (<li key={message.id}>{`${message.user_id}: ${message.value}`}</li>))}
+        </ul>
+        <form onSubmit={this.handleSubmit}>
+          <span />
+          <input ref={(input) => { this.input = input; }} type="text" value={value} onChange={this.handleChange} />
+          <input type="submit" />
+        </form>
       </div>
     );
   }
