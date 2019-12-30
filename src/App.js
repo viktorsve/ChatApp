@@ -8,6 +8,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      username: '',
       value: '',
       messages: []
     };
@@ -19,8 +20,6 @@ class App extends Component {
 
   componentDidMount() {
     this.focusInput();
-
-    // fix this eslint error later, idk how though :)
 
     socket.on('message', message => {
       this.setState({ messages: [...this.state.messages, message] });
@@ -36,26 +35,50 @@ class App extends Component {
   }
 
   handleSubmit(e) {
-    const { value } = this.state;
+    const { username, value } = this.state;
 
     e.preventDefault();
-    socket.emit('message', { value });
+
+    if (username === '') {
+      this.setState({ username: value });
+    } else {
+      socket.emit('message', { username, value });
+    }
+
     this.setState({ value: '' });
   }
 
   render() {
-    const { value, messages } = this.state;
+    const { username, value, messages } = this.state;
+    let form;
 
-    return (
-      <div className="App" onClick={this.focusInput}>
-        <ul>
-          {messages.map((message) => (<li key={message.id}>{`${message.user_id}: ${message.value}`}</li>))}
-        </ul>
+    if (username === '') {
+      form = (
+        <form onSubmit={this.handleSubmit}>
+          Username:&nbsp;
+          <input ref={input => { this.input = input; }} type="text" value={value} onChange={this.handleChange} />
+          <input type="submit" />
+        </form>
+      );
+    } else {
+      form = (
         <form onSubmit={this.handleSubmit}>
           <span />
           <input ref={(input) => { this.input = input; }} type="text" value={value} onChange={this.handleChange} />
           <input type="submit" />
         </form>
+      );
+    }
+
+    return (
+      <div className="App" onClick={this.focusInput}>
+        {username !== '' && (
+          <p>{`Logged in as ${username}`}</p>
+        )}
+        <ul>
+          {messages.map((message) => (<li key={message.id}>{`${message.user}: ${message.value}`}</li>))}
+        </ul>
+        {form}
       </div>
     );
   }
