@@ -22,6 +22,8 @@
         "comma-dangle": "off",
         "arrow-parens": "off",
         "react/jsx-filename-extension": "off",
-        "no-console": "off"
+        "no-console": "off",
+        "linebreak-style": "off",
+        "import/no-extraneous-dependencies": "off"
     }
 }
