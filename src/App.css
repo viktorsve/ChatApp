@@ -17,3 +17,7 @@ form input[type="text"]{
 form input[type="submit"]{
   display: none;
 }
+
+.timestamp{
+  color: #777;
+}
