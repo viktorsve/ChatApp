@@ -76,7 +76,7 @@ class App extends Component {
           <p>{`Logged in as ${username}`}</p>
         )}
         <ul>
-          {messages.map((message) => (<li key={message.id}>{`${message.user}: ${message.value}`}</li>))}
+          {messages.map((message) => (<li key={message.id}>{`[${message.sentAt}] ${message.user}: ${message.value}`}</li>))}
         </ul>
         {form}
       </div>
