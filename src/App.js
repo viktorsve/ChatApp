@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import openSocket from 'socket.io-client';
+import axios from 'axios';
 
 const socket = openSocket('http://localhost:8000');
 
@@ -10,12 +11,15 @@ class App extends Component {
     this.state = {
       username: '',
       value: '',
-      messages: []
+      messages: [],
+      roomName: '',
+      token: null
     };
 
     this.focusInput = this.focusInput.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.getToken = this.getToken.bind(this);
   }
 
   componentDidMount() {
@@ -24,6 +28,28 @@ class App extends Component {
     socket.on('message', message => {
       this.setState({ messages: [...this.state.messages, message] });
     });
+  }
+
+  async getToken() {
+    const { username, roomName } = this.state;
+
+    const postData = JSON.stringify({
+      identity: username,
+      room: roomName,
+    });
+
+    const axiosConfig = {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+
+    try {
+      const res = await axios.post('/video/token', postData, axiosConfig);
+      this.setState({ token: res.data.token });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   focusInput() {
