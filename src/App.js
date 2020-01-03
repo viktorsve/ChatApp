@@ -17,13 +17,17 @@ class App extends Component {
       token: null,
       scrolledToBottom: true,
       newMessages: false,
-      connectedUsers: []
+      connectedUsers: [],
+      isTyping: false,
+      typingUser: []
     };
 
     this.focusInput = this.focusInput.bind(this);
     this.handleScroll = this.handleScroll.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleTyping = this.handleTyping.bind(this);
+    this.stoppedTyping = this.stoppedTyping.bind(this);
   }
 
   componentDidMount() {
@@ -48,6 +52,19 @@ class App extends Component {
     });
     socket.on('update userlist', connectedUsers => {
       this.setState({ connectedUsers });
+    });
+    socket.on('user is writing', username => {
+      const { typingUser } = this.state;
+      const doesUserExist = typingUser.includes(username);
+      if (doesUserExist === false) {
+        typingUser.push(username);
+        this.setState({ typingUser });
+      }
+    });
+    socket.on('stopped typing message', username => {
+      let { typingUser } = this.state;
+      typingUser = typingUser.filter(e => e !== username);
+      this.setState({ typingUser });
     });
   }
 
@@ -128,6 +145,17 @@ class App extends Component {
     this.setState({ value: '' });
   }
 
+  handleTyping() {
+    const { username } = this.state;
+    socket.emit('user is writing', username);
+    setTimeout(this.stoppedTyping, 4000);
+  }
+
+  stoppedTyping() {
+    const { username } = this.state;
+    socket.emit('stopped typing message', username);
+  }
+
   saveChatHistory() {
     const saveArray = [];
     const NodeList = document.getElementsByClassName('chatMessage');
@@ -148,21 +176,15 @@ class App extends Component {
 
   render() {
     const {
-      username, value, messages, token, connectedUsers, newMessages
+      username, value, messages, token, connectedUsers, newMessages, typingUser
     } = this.state;
 
     const form = (
       <form onSubmit={this.handleSubmit}>
         {username === '' ? 'Username: ' : <span />}
-        <input
-          ref={input => {
-            this.input = input;
-          }}
-          type="text"
-          value={value}
-          onChange={this.handleChange}
-        />
+        <input ref={input => { this.input = input; }} type="text" value={value} onChange={e => { this.handleChange(e); this.handleTyping(); }} />
         <input type="submit" />
+        <p>{typingUser.length !== 0 ? `${typingUser} is typing` : ''}</p>
       </form>
     );
 
