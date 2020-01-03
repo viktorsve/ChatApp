@@ -15,7 +15,8 @@ class App extends Component {
       messages: [],
       token: null,
       scrolledToBottom: true,
-      newMessages: false
+      newMessages: false,
+      connectedUsers: []
     };
 
     this.focusInput = this.focusInput.bind(this);
@@ -25,12 +26,14 @@ class App extends Component {
   }
 
   componentDidMount() {
+    const { messages } = this.state;
+
     this.focusInput();
 
     window.addEventListener('scroll', this.handleScroll);
 
     socket.on('message history', previousMessages => {
-      this.setState({ messages: [...this.state.messages, ...previousMessages] });
+      this.setState({ messages: [...messages, ...previousMessages] });
     });
 
     socket.on('message', message => {
@@ -40,7 +43,10 @@ class App extends Component {
         this.setState({ newMessages: true });
       }
 
-      this.setState({ messages: [...this.state.messages, message] });
+      this.setState({ messages: [...messages, message] });
+    });
+    socket.on('update userlist', connectedUsers => {
+      this.setState({ connectedUsers });
     });
   }
 
@@ -105,6 +111,7 @@ class App extends Component {
 
     if (username === '') {
       this.setState({ username: value });
+      socket.emit('add user', value);
     } else {
       socket.emit('message', { username, value });
     }
@@ -120,29 +127,23 @@ class App extends Component {
 
   render() {
     const {
-      username, value, messages, token
+      username, value, messages, token, connectedUsers, newMessages
     } = this.state;
-    let form;
 
-    if (username === '') {
-      form = (
-        <form onSubmit={this.handleSubmit}>
-          Username:&nbsp;
-          <input ref={input => { this.input = input; }} type="text" value={value} onChange={this.handleChange} />
-          <input type="submit" />
-        </form>
-      );
-    } else {
-      form = (
-        <form onSubmit={this.handleSubmit}>
-          <span />
-          <input ref={(input) => { this.input = input; }} type="text" value={value} onChange={this.handleChange} />
-          <input type="submit" />
-        </form>
-      );
-    }
-
-    const { newMessages } = this.state;
+    const form = (
+      <form onSubmit={this.handleSubmit}>
+        {username === '' ? 'Username: ' : <span />}
+        <input
+          ref={input => {
+            this.input = input;
+          }}
+          type="text"
+          value={value}
+          onChange={this.handleChange}
+        />
+        <input type="submit" />
+      </form>
+    );
 
     return (
       <div className="App" onClick={this.focusInput}>
@@ -179,6 +180,14 @@ class App extends Component {
         ) : (
           ''
         )}
+        <div className="user-list">
+          <ul>
+            <li className="mt-30">Connected users:</li>
+            {connectedUsers.map(connectedUser => (
+              <li key={connectedUser.id}>{connectedUser.username}</li>
+            ))}
+          </ul>
+        </div>
       </div>
     );
   }
