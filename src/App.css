@@ -68,7 +68,7 @@ input:focus {
   width: 100%;
 }
 
-.newMessages{
+.newMessages {
   position: fixed;
   bottom: 0;
   background-color: black;
@@ -76,16 +76,20 @@ input:focus {
   width: 100%;
 }
 
-.newMessages p{
+.newMessages p {
   display: inline;
 }
 
-.newMessages p:first-child{
+.newMessages p:first-child {
   color: red;
   font-weight: bold;
 }
 
-.newMessages p:last-child{
+.newMessages p:last-child {
   text-decoration: underline;
   cursor: pointer;
+}
+
+.mt-30 {
+  margin-top: 30px;
 }
