@@ -33,6 +33,12 @@ io.on('connection', socket => {
     connectedUsers = updatedUserList;
     io.emit('update userlist', connectedUsers);
   });
+  socket.on('user is writing', username => {
+    socket.broadcast.emit('user is writing', username);
+  });
+  socket.on('stopped typing message', username => {
+    socket.broadcast.emit('stopped typing message', username);
+  });
 });
 
 const port = 8000;
