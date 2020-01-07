@@ -24,6 +24,10 @@ class App extends Component {
   componentDidMount() {
     this.focusInput();
 
+    socket.on('message history', previousMessages => {
+      this.setState({ messages: [...this.state.messages, ...previousMessages] });
+    });
+
     socket.on('message', message => {
       this.setState({ messages: [...this.state.messages, message] });
     });
@@ -113,7 +117,7 @@ class App extends Component {
           <p>{`Logged in as ${username}`}</p>
         )}
         <ul>
-          {messages.map((message) => (
+          {username && messages.map((message) => (
             <li key={message.id}>
               <span className="timestamp">{`[${message.sentAt}] `}</span>
               <span style={{ color: `hsl(${message.userColor}, 50%, 50%)` }}>{`${message.user}`}</span>
