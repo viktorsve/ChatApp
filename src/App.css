@@ -1,23 +1,48 @@
-.App{
+.App {
   min-height: 100vh;
 }
 
-form span:before{
+form span:before {
   content: "> ";
 }
 
-form input[type="text"]{
-  background-color: rgba(0,0,0,0);
+form input[type="text"] {
+  background-color: rgba(0, 0, 0, 0);
   border: none;
   color: #eee;
   display: inline;
   width: 50%;
 }
 
-form input[type="submit"]{
+form input[type="submit"] {
   display: none;
 }
 
-.timestamp{
+.timestamp {
   color: #777;
+}
+
+input:focus {
+  outline: none;
+}
+
+.room {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  min-height: 100%;
+  max-width: 408px;
+}
+
+.local video {
+  width: 404px;
+}
+
+.remote video {
+  width: 200px;
+  margin-right: 4px;
+}
+
+.remote video:only-of-type {
+  width: 404px;
 }
