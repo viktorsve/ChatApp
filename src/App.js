@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import openSocket from 'socket.io-client';
 import axios from 'axios';
+import VideoComponent from './VideoComponent';
 
 const socket = openSocket('http://localhost:8000');
 
@@ -12,14 +13,12 @@ class App extends Component {
       username: '',
       value: '',
       messages: [],
-      roomName: '',
       token: null
     };
 
     this.focusInput = this.focusInput.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.getToken = this.getToken.bind(this);
   }
 
   componentDidMount() {
@@ -31,11 +30,11 @@ class App extends Component {
   }
 
   async getToken() {
-    const { username, roomName } = this.state;
+    const { username } = this.state;
 
     const postData = JSON.stringify({
       identity: username,
-      room: roomName,
+      room: 'video',
     });
 
     const axiosConfig = {
@@ -50,6 +49,10 @@ class App extends Component {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  clearToken() {
+    this.setState({ token: null });
   }
 
   focusInput() {
@@ -71,11 +74,19 @@ class App extends Component {
       socket.emit('message', { username, value });
     }
 
+    if (value === '/join video chat' && username !== '') {
+      this.getToken();
+    } else if (value === '/leave video chat') {
+      this.clearToken();
+    }
+
     this.setState({ value: '' });
   }
 
   render() {
-    const { username, value, messages } = this.state;
+    const {
+      username, value, messages, token
+    } = this.state;
     let form;
 
     if (username === '') {
@@ -111,6 +122,11 @@ class App extends Component {
           ))}
         </ul>
         {form}
+        {token ? (
+          <VideoComponent token={token} />
+        ) : (
+          ''
+        )}
       </div>
     );
   }
