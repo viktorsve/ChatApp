@@ -3,6 +3,8 @@ import Video from 'twilio-video';
 import PropTypes from 'prop-types';
 import ParticipantComponent from './ParticipantComponent';
 
+/* Component is used for connecting to the twilio video chat room using a JWT token.
+Also stores a list of all users that are connected to the chat room. */
 class VideoComponent extends Component {
   constructor(props) {
     super(props);
@@ -34,6 +36,7 @@ class VideoComponent extends Component {
 
   componentWillUnmount() {
     const { room } = this.state;
+
     room.disconnect();
   }
 
@@ -43,21 +46,19 @@ class VideoComponent extends Component {
     }));
   }
 
-  participantDisconnect(participant) {
+  participantDisconnect(disconnectedParticipant) {
     this.setState(prevState => ({
-      participants: prevState.participants.filter(p => p !== participant)
+      participants: prevState.participants.filter(
+        participant => participant !== disconnectedParticipant
+      )
     }));
   }
 
   render() {
     const { participants, room } = this.state;
 
-    const remoteParticipants = participants.map(participant => (
-      <ParticipantComponent key={participant.sid} participant={participant} />
-    ));
-
     return (
-      <div className="room">
+      <div className="video-room">
         <div className="local">
           {room ? (
             <ParticipantComponent
@@ -68,7 +69,11 @@ class VideoComponent extends Component {
             ''
           )}
         </div>
-        <div className="remote">{remoteParticipants}</div>
+        <div className="remote">
+          {participants.map(participant => (
+            <ParticipantComponent key={participant.sid} participant={participant} />
+          ))}
+        </div>
       </div>
     );
   }

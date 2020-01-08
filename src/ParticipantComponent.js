@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+/* This component is used for handling video and audio tracks that belong to users in the chat room.
+Will also manipulate the DOM and add the tracks to the corresponding HTML elements */
 class ParticipantComponent extends Component {
   constructor(props) {
     super(props);
@@ -17,11 +19,10 @@ class ParticipantComponent extends Component {
   componentDidMount() {
     const { participant } = this.props;
 
-    this.setState({
-      videoTracks: [Array.from(participant.videoTracks.values())[0]],
-      audioTracks: [Array.from(participant.audioTracks.values())[0]]
-    });
-
+    this.setState(prevState => ({
+      videoTracks: [...prevState.videoTracks, ...Array.from(participant.videoTracks.values())],
+      audioTracks: [...prevState.audioTracks, ...Array.from(participant.audioTracks.values())]
+    }));
     participant.on('trackSubscribed', track => {
       this.trackSubscribed(track);
     });
@@ -32,6 +33,7 @@ class ParticipantComponent extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { videoTracks, audioTracks } = this.state;
+
     if (videoTracks !== prevState.videoTracks) {
       this.attachVideo();
     } else if (audioTracks !== prevState.audioTracks) {
@@ -46,19 +48,18 @@ class ParticipantComponent extends Component {
       videoTracks: [],
       audioTracks: []
     });
-
     participant.removeAllListeners();
   }
 
   trackSubscribed(track) {
     if (track.kind === 'video') {
-      this.setState({
-        videoTracks: [track]
-      });
+      this.setState(prevState => ({
+        videoTracks: [...prevState.videoTracks, track]
+      }));
     } else {
-      this.setState({
-        audioTracks: [track]
-      });
+      this.setState(prevState => ({
+        audioTracks: [...prevState.audioTracks, track]
+      }));
     }
   }
 
@@ -76,19 +77,17 @@ class ParticipantComponent extends Component {
 
   attachVideo() {
     const { videoTracks } = this.state;
-    const videoTrack = videoTracks[0];
 
-    if (videoTrack) {
-      videoTrack.attach(this.videoRef.current);
+    if (videoTracks[0]) {
+      videoTracks[0].attach(this.videoRef.current);
     }
   }
 
   attachAudio() {
     const { audioTracks } = this.state;
-    const audioTrack = audioTracks[0];
 
-    if (audioTrack) {
-      audioTrack.attach(this.audioRef.current);
+    if (audioTracks[0]) {
+      audioTracks[0].attach(this.audioRef.current);
     }
   }
 
