@@ -37,7 +37,9 @@ class VideoComponent extends Component {
   componentWillUnmount() {
     const { room } = this.state;
 
-    room.disconnect();
+    if (room) {
+      room.disconnect();
+    }
   }
 
   participantConnected(participant) {
