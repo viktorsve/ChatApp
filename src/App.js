@@ -31,6 +31,12 @@ class App extends Component {
     socket.on('message', message => {
       this.setState({ messages: [...this.state.messages, message] });
     });
+
+    this.scrollToBottom();
+  }
+
+  componentDidUpdate() {
+    this.scrollToBottom();
   }
 
   async getToken() {
@@ -61,6 +67,10 @@ class App extends Component {
 
   focusInput() {
     this.input.focus();
+  }
+
+  scrollToBottom() {
+    this.input.scrollIntoView();
   }
 
   handleChange(e) {
