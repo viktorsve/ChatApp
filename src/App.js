@@ -114,7 +114,14 @@ class App extends Component {
     return (
       <div className="App" onClick={this.focusInput}>
         {username !== '' && (
-          <p>{`Logged in as ${username}`}</p>
+          <>
+            <p>{`Logged in as ${username}`}</p>
+            <p>Available commands for this chat:</p>
+            <ul>
+              <li>/join video chat</li>
+              <li>/leave video chat</li>
+            </ul>
+          </>
         )}
         <ul>
           {username && messages.map((message) => (
