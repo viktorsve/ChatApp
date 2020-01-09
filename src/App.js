@@ -13,10 +13,13 @@ class App extends Component {
       username: '',
       value: '',
       messages: [],
-      token: null
+      token: null,
+      scrolledToBottom: true,
+      newMessages: false
     };
 
     this.focusInput = this.focusInput.bind(this);
+    this.handleScroll = this.handleScroll.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -24,19 +27,29 @@ class App extends Component {
   componentDidMount() {
     this.focusInput();
 
+    window.addEventListener('scroll', this.handleScroll);
+
     socket.on('message history', previousMessages => {
       this.setState({ messages: [...this.state.messages, ...previousMessages] });
     });
 
     socket.on('message', message => {
+      const { scrolledToBottom } = this.state;
+
+      if (scrolledToBottom === false) {
+        this.setState({ newMessages: true });
+      }
+
       this.setState({ messages: [...this.state.messages, message] });
     });
-
-    this.scrollToBottom();
   }
 
   componentDidUpdate() {
-    this.scrollToBottom();
+    const { scrolledToBottom } = this.state;
+
+    if (scrolledToBottom === true) {
+      this.scrollToBottom();
+    }
   }
 
   async getToken() {
@@ -67,6 +80,14 @@ class App extends Component {
 
   focusInput() {
     this.input.focus();
+  }
+
+  handleScroll() {
+    if (window.scrollY === window.scrollMaxY) {
+      this.setState({ scrolledToBottom: true, newMessages: false });
+    } else {
+      this.setState({ scrolledToBottom: false });
+    }
   }
 
   scrollToBottom() {
@@ -120,6 +141,8 @@ class App extends Component {
         </form>
       );
     }
+
+    const { newMessages } = this.state;
 
     return (
       <div className="App" onClick={this.focusInput}>
