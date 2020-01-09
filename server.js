@@ -5,7 +5,7 @@ const messages = []; // Limit the size in future maybe
 let connectedUsers = [];
 
 io.on('connection', socket => {
-  socket.color = Math.floor(Math.random() * 255);
+  socket.color = Math.floor(Math.random() * 255); // eslint-disable-line no-param-reassign
   console.log('a user connected');
   io.to(`${socket.id}`).emit('message history', messages);
   socket.on('message', message => {
@@ -22,7 +22,7 @@ io.on('connection', socket => {
     messageId += 1;
   });
   socket.on('add user', username => {
-    const connectedUser = { id: socket.id, username };
+    const connectedUser = { id: socket.id, username, userColor: socket.color };
     connectedUsers.push(connectedUser);
     io.emit('update userlist', connectedUsers);
     console.log(connectedUsers);

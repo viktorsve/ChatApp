@@ -2,14 +2,29 @@
   min-height: 100vh;
 }
 
-.message-container ul,
-.message-container p {
-  width: 65%;
+.flex-container {
+  display: flex;
 }
 
-.message-container li,
-.message-container p {
+.message-container {
+  flex: 1;
   word-break: break-all;
+}
+
+.user-list {
+  position: sticky;
+  top: 0px;
+  align-self: flex-start;
+  width: 145px;
+  margin-left: 30px;
+  height: 100vh;
+  word-break: break-all;
+  text-align: center;
+  overflow-y: auto;
+}
+
+.user-list ul {
+  list-style: none;
 }
 
 form span:before {
@@ -20,7 +35,6 @@ form input[type="text"] {
   background-color: rgba(0, 0, 0, 0);
   border: none;
   color: #eee;
-  display: inline;
   width: 50%;
 }
 
@@ -37,14 +51,16 @@ input:focus {
 }
 
 .video-room {
-  position: fixed;
+  position: sticky;
   top: 0px;
-  right: 0px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-self: flex-start;
   width: 30%;
   height: 100vh;
+  margin-right: 15px;
+  margin-left: 15px;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -88,8 +104,4 @@ input:focus {
 .newMessages p:last-child {
   text-decoration: underline;
   cursor: pointer;
-}
-
-.mt-30 {
-  margin-top: 30px;
 }

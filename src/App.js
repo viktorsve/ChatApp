@@ -26,18 +26,18 @@ class App extends Component {
   }
 
   componentDidMount() {
-    const { messages } = this.state;
-
     this.focusInput();
 
     window.addEventListener('scroll', this.handleScroll);
 
     socket.on('message history', previousMessages => {
+      const { messages } = this.state;
+
       this.setState({ messages: [...messages, ...previousMessages] });
     });
 
     socket.on('message', message => {
-      const { scrolledToBottom } = this.state;
+      const { scrolledToBottom, messages } = this.state;
 
       if (scrolledToBottom === false) {
         this.setState({ newMessages: true });
@@ -89,7 +89,9 @@ class App extends Component {
   }
 
   handleScroll() {
-    if (window.scrollY === window.scrollMaxY) {
+    const rootElement = document.documentElement;
+
+    if (window.scrollY === rootElement.scrollHeight - rootElement.clientHeight) {
       this.setState({ scrolledToBottom: true, newMessages: false });
     } else {
       this.setState({ scrolledToBottom: false });
@@ -146,27 +148,45 @@ class App extends Component {
     );
 
     return (
-      <div className="App" onClick={this.focusInput}>
-        <div className="message-container">
-          {username !== '' && (
-            <>
-              <p>{`Logged in as ${username}`}</p>
-              <p>{`Available commands for ${username}:`}</p>
+      <div className="App" aria-hidden onClick={this.focusInput}>
+        <div className="flex-container">
+          <div className="message-container">
+            {username !== '' && (
+              <>
+                <p>{`Logged in as ${username}`}</p>
+                <p>{`Available commands for ${username}:`}</p>
+                <ul>
+                  <li>/join video chat</li>
+                  <li>/leave video chat</li>
+                </ul>
+              </>
+            )}
+            <ul>
+              {messages.map((message) => (
+                <li key={message.id}>
+                  <span className="timestamp">{`[${message.sentAt}] `}</span>
+                  <span style={{ color: `hsl(${message.userColor}, 50%, 50%)` }}>{`${message.user}`}</span>
+                  {`: ${message.value}`}
+                </li>
+              ))}
+            </ul>
+            {form}
+          </div>
+          {connectedUsers[0] ? (
+            <div className="user-list">
               <ul>
-                <li>/join video chat</li>
-                <li>/leave video chat</li>
+                <li>Connected users:</li>
+                {connectedUsers.map(connectedUser => (
+                  <li style={{ color: `hsl(${connectedUser.userColor}, 50%, 50%)` }} key={connectedUser.id}>{connectedUser.username}</li>
+                ))}
               </ul>
-            </>
+            </div>
+          ) : ''}
+          {token ? (
+            <VideoComponent token={token} />
+          ) : (
+            ''
           )}
-          <ul>
-            {messages.map((message) => (
-              <li key={message.id}>
-                <span className="timestamp">{`[${message.sentAt}] `}</span>
-                <span style={{ color: `hsl(${message.userColor}, 50%, 50%)` }}>{`${message.user}`}</span>
-                {`: ${message.value}`}
-              </li>
-            ))}
-          </ul>
         </div>
         {newMessages && (
           <div className="newMessages">
@@ -174,20 +194,6 @@ class App extends Component {
             <p>Go to bottom</p>
           </div>
         )}
-        {form}
-        {token ? (
-          <VideoComponent token={token} />
-        ) : (
-          ''
-        )}
-        <div className="user-list">
-          <ul>
-            <li className="mt-30">Connected users:</li>
-            {connectedUsers.map(connectedUser => (
-              <li key={connectedUser.id}>{connectedUser.username}</li>
-            ))}
-          </ul>
-        </div>
       </div>
     );
   }
