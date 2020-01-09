@@ -167,6 +167,12 @@ class App extends Component {
             ))}
           </ul>
         </div>
+        {newMessages && (
+          <div className="newMessages">
+            <p>NEW MESSAGES BELOW&nbsp;</p>
+            <p>Go to bottom</p>
+          </div>
+        )}
         {form}
         {token ? (
           <VideoComponent token={token} />
