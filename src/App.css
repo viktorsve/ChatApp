@@ -2,6 +2,16 @@
   min-height: 100vh;
 }
 
+.message-container ul,
+.message-container p {
+  width: 65%;
+}
+
+.message-container li,
+.message-container p {
+  word-break: break-all;
+}
+
 form span:before {
   content: "> ";
 }
@@ -26,23 +36,34 @@ input:focus {
   outline: none;
 }
 
-.room {
-  position: absolute;
+.video-room {
+  position: fixed;
   top: 0px;
   right: 0px;
-  min-height: 100%;
-  max-width: 408px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 30%;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.local,
+.remote {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .local video {
-  width: 404px;
+  width: 100%;
 }
 
 .remote video {
-  width: 200px;
-  margin-right: 4px;
+  width: 50%;
 }
 
 .remote video:only-of-type {
-  width: 404px;
+  width: 100%;
 }

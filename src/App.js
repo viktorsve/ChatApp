@@ -113,25 +113,27 @@ class App extends Component {
 
     return (
       <div className="App" onClick={this.focusInput}>
-        {username !== '' && (
-          <>
-            <p>{`Logged in as ${username}`}</p>
-            <p>Available commands for this chat:</p>
-            <ul>
-              <li>/join video chat</li>
-              <li>/leave video chat</li>
-            </ul>
-          </>
-        )}
-        <ul>
-          {username && messages.map((message) => (
-            <li key={message.id}>
-              <span className="timestamp">{`[${message.sentAt}] `}</span>
-              <span style={{ color: `hsl(${message.userColor}, 50%, 50%)` }}>{`${message.user}`}</span>
-              {`: ${message.value}`}
-            </li>
-          ))}
-        </ul>
+        <div className="message-container">
+          {username !== '' && (
+            <>
+              <p>{`Logged in as ${username}`}</p>
+              <p>{`Available commands for ${username}:`}</p>
+              <ul>
+                <li>/join video chat</li>
+                <li>/leave video chat</li>
+              </ul>
+            </>
+          )}
+          <ul>
+            {messages.map((message) => (
+              <li key={message.id}>
+                <span className="timestamp">{`[${message.sentAt}] `}</span>
+                <span style={{ color: `hsl(${message.userColor}, 50%, 50%)` }}>{`${message.user}`}</span>
+                {`: ${message.value}`}
+              </li>
+            ))}
+          </ul>
+        </div>
         {form}
         {token ? (
           <VideoComponent token={token} />
