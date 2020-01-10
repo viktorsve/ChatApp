@@ -3,8 +3,16 @@ const io = require('socket.io')();
 let messageId = 1;
 const messages = []; // Limit the size in future maybe
 let connectedUsers = [];
+const rooms = [{ name: 'general', owner: null }];
+
+const joinRoom = (socket, room) => {
+  socket.leaveAll();
+  socket.join(room);
+  io.to(`${socket.id}`).emit('joined room', room);
+};
 
 io.on('connection', socket => {
+  socket.join('general');
   socket.color = Math.floor(Math.random() * 255); // eslint-disable-line no-param-reassign
   console.log('a user connected');
   io.to(`${socket.id}`).emit('message history', messages);
@@ -18,7 +26,8 @@ io.on('connection', socket => {
     };
     messages.push(messageObject);
     console.log(messageObject);
-    io.emit('message', messageObject);
+    console.log(`to room ${message.room}`);
+    io.to(message.room).emit('message', messageObject);
     messageId += 1;
   });
   socket.on('add user', username => {
@@ -26,6 +35,15 @@ io.on('connection', socket => {
     connectedUsers.push(connectedUser);
     io.emit('update userlist', connectedUsers);
     console.log(connectedUsers);
+  });
+  socket.on('create room', room => {
+    rooms.push({ name: room.value, owner: room.username });
+    console.log(rooms);
+
+    joinRoom(socket, room.value);
+  });
+  socket.on('join room', room => {
+    joinRoom(socket, room.value);
   });
   socket.on('disconnect', () => {
     console.log('user disconnected');
