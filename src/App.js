@@ -19,7 +19,10 @@ class App extends Component {
       newMessages: false,
       connectedUsers: [],
       isTyping: false,
-      typingUser: []
+      typingUser: [],
+      creatingRoom: false,
+      joiningRoom: false,
+      room: 'general'
     };
 
     this.focusInput = this.focusInput.bind(this);
@@ -65,6 +68,11 @@ class App extends Component {
       let { typingUser } = this.state;
       typingUser = typingUser.filter(e => e !== username);
       this.setState({ typingUser });
+    });
+
+    socket.on('joined room', room => {
+      console.log(room)
+      this.setState({ room });
     });
   }
 
@@ -125,21 +133,31 @@ class App extends Component {
   }
 
   handleSubmit(e) {
-    const { username, value } = this.state;
+    const { username, value, creatingRoom, joiningRoom, room } = this.state;
 
     e.preventDefault();
 
     if (username === '') {
       this.setState({ username: value });
       socket.emit('add user', value);
+    } else if (creatingRoom === true) {
+      socket.emit('create room', { username, value });
+      this.setState({ room: value, creatingRoom: false });
+    } else if (joiningRoom === true) {
+      socket.emit('join room', { username, value });
+      this.setState({ room: value, joiningRoom: false });
     } else {
-      socket.emit('message', { username, value });
+      socket.emit('message', { username, value, room });
     }
 
     if (value === '/join video chat' && username !== '') {
       this.getToken();
     } else if (value === '/leave video chat') {
       this.clearToken();
+    } else if (value === '/create room') {
+      this.createRoom();
+    } else if (value === '/join room') {
+      this.joinRoom();
     }
 
     this.setState({ value: '' });
@@ -174,10 +192,28 @@ class App extends Component {
     saveAs(blob, `${today}-ChaApp-ChatHistory.txt`);
   }
 
+  createRoom() {
+    this.setState({ creatingRoom: true });
+  }
+
+  joinRoom() {
+    this.setState({ joiningRoom: true });
+  }
+  
   render() {
     const {
-      username, value, messages, token, connectedUsers, newMessages, typingUser
+      username, value, messages, token, connectedUsers, newMessages, typingUser, creatingRoom, joiningRoom
     } = this.state;
+
+    let inputText;
+
+    if (username === '') {
+      inputText = 'Username: ';
+    } else if (creatingRoom === true || joiningRoom === true) {
+      inputText = 'Room name: ';
+    } else {
+      inputText = <span />;
+    }
 
     const form = (
       <form onSubmit={this.handleSubmit}>
