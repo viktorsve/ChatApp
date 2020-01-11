@@ -6,9 +6,12 @@ let connectedUsers = [];
 const rooms = [{ name: 'general', owner: null }];
 
 const joinRoom = (socket, room) => {
-  socket.leaveAll();
-  socket.join(room);
-  io.to(`${socket.id}`).emit('joined room', room);
+  if (rooms.some(r => r.name === room)) {
+    io.to(`${socket.id}`).emit('joined room', room);
+
+    socket.leaveAll();
+    socket.join(room);
+  }
 };
 
 io.on('connection', socket => {
