@@ -71,7 +71,6 @@ class App extends Component {
     });
 
     socket.on('joined room', room => {
-      console.log(room)
       this.setState({ room });
     });
   }
@@ -142,10 +141,10 @@ class App extends Component {
       socket.emit('add user', value);
     } else if (creatingRoom === true) {
       socket.emit('create room', { username, value });
-      this.setState({ room: value, creatingRoom: false });
+      this.setState({ creatingRoom: false });
     } else if (joiningRoom === true) {
       socket.emit('join room', { username, value });
-      this.setState({ room: value, joiningRoom: false });
+      this.setState({ joiningRoom: false });
     } else {
       socket.emit('message', { username, value, room });
     }
