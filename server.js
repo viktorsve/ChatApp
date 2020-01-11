@@ -40,10 +40,12 @@ io.on('connection', socket => {
     console.log(connectedUsers);
   });
   socket.on('create room', room => {
-    rooms.push({ name: room.value, owner: room.username });
-    console.log(rooms);
+    if (rooms.filter(r => r.name === room.value).length === 0) {
+      rooms.push({ name: room.value, owner: room.username });
+      console.log(rooms);
 
-    joinRoom(socket, room.value);
+      joinRoom(socket, room.value);
+    }
   });
   socket.on('join room', room => {
     joinRoom(socket, room.value);
