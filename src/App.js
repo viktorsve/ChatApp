@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import openSocket from 'socket.io-client';
 import axios from 'axios';
+import { saveAs } from 'file-saver';
 import VideoComponent from './VideoComponent';
 
 const socket = openSocket('http://localhost:8000');
@@ -63,7 +64,7 @@ class App extends Component {
 
     const postData = JSON.stringify({
       identity: username,
-      room: 'video',
+      room: 'video'
     });
 
     const axiosConfig = {
@@ -127,6 +128,24 @@ class App extends Component {
     this.setState({ value: '' });
   }
 
+  saveChatHistory() {
+    const saveArray = [];
+    const NodeList = document.getElementsByClassName('chatMessage');
+    Array.from(NodeList).forEach((el) => {
+      saveArray.push(el.textContent);
+    });
+    const formattedArray = saveArray.join('\n');
+    const blob = new Blob([formattedArray], {
+      type: 'text/plain;charset=utf-8'
+    });
+    let today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const yyyy = today.getFullYear();
+    today = `${dd}-${mm}-${yyyy}`;
+    saveAs(blob, `${today}-ChaApp-ChatHistory.txt`);
+  }
+
   render() {
     const {
       username, value, messages, token, connectedUsers, newMessages
@@ -162,14 +181,20 @@ class App extends Component {
               </>
             )}
             <ul>
-              {messages.map((message) => (
-                <li key={message.id}>
+              {messages.map(message => (
+                <li className="chatMessage" key={message.id}>
                   <span className="timestamp">{`[${message.sentAt}] `}</span>
-                  <span style={{ color: `hsl(${message.userColor}, 50%, 50%)` }}>{`${message.user}`}</span>
+                  <span
+                    style={{ color: `hsl(${message.userColor}, 50%, 50%)` }}
+                  >
+                    {`${message.user}`}
+
+                  </span>
                   {`: ${message.value}`}
                 </li>
               ))}
             </ul>
+
             {form}
           </div>
           {connectedUsers[0] ? (
@@ -185,8 +210,8 @@ class App extends Component {
           {token ? (
             <VideoComponent token={token} />
           ) : (
-            ''
-          )}
+              ''
+            )}
         </div>
         {newMessages && (
           <div className="newMessages">
@@ -194,6 +219,12 @@ class App extends Component {
             <p>Go to bottom</p>
           </div>
         )}
+        {username !== '' ? (
+          <button onClick={this.saveChatHistory}>Save chat</button>
+        ) : (
+            ''
+          )}
+        <div />
       </div>
     );
   }
