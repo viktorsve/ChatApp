@@ -105,3 +105,9 @@ input:focus {
   text-decoration: underline;
   cursor: pointer;
 }
+
+.save-chat-btn{
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
