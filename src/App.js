@@ -18,7 +18,6 @@ class App extends Component {
       scrolledToBottom: true,
       newMessages: false,
       connectedUsers: [],
-      isTyping: false,
       typingUser: [],
       creatingRoom: false,
       joiningRoom: false,
@@ -132,7 +131,9 @@ class App extends Component {
   }
 
   handleSubmit(e) {
-    const { username, value, creatingRoom, joiningRoom, room } = this.state;
+    const {
+      username, value, creatingRoom, joiningRoom, room
+    } = this.state;
 
     e.preventDefault();
 
@@ -173,6 +174,7 @@ class App extends Component {
     socket.emit('stopped typing message', username);
   }
 
+  /* eslint-disable class-methods-use-this */
   saveChatHistory() {
     const saveArray = [];
     const NodeList = document.getElementsByClassName('chatMessage');
@@ -190,6 +192,7 @@ class App extends Component {
     today = `${dd}-${mm}-${yyyy}`;
     saveAs(blob, `${today}-ChaApp-ChatHistory.txt`);
   }
+  /* eslint-enable class-methods-use-this */
 
   createRoom() {
     this.setState({ creatingRoom: true });
@@ -198,10 +201,18 @@ class App extends Component {
   joinRoom() {
     this.setState({ joiningRoom: true });
   }
-  
+
   render() {
     const {
-      username, value, messages, token, connectedUsers, newMessages, typingUser, creatingRoom, joiningRoom
+      username,
+      value,
+      messages,
+      token,
+      connectedUsers,
+      newMessages,
+      typingUser,
+      creatingRoom,
+      joiningRoom
     } = this.state;
 
     let inputText;
@@ -216,7 +227,7 @@ class App extends Component {
 
     const form = (
       <form onSubmit={this.handleSubmit}>
-        {username === '' ? 'Username: ' : <span />}
+        {inputText}
         <input ref={input => { this.input = input; }} type="text" value={value} onChange={e => { this.handleChange(e); this.handleTyping(); }} />
         <input type="submit" />
         <p>{typingUser.length !== 0 ? `${typingUser} is typing` : ''}</p>
@@ -267,8 +278,8 @@ class App extends Component {
           {token ? (
             <VideoComponent token={token} />
           ) : (
-              ''
-            )}
+            ''
+          )}
         </div>
         {newMessages && (
           <div className="newMessages">
@@ -277,10 +288,10 @@ class App extends Component {
           </div>
         )}
         {username !== '' ? (
-          <button onClick={this.saveChatHistory}>Save chat</button>
+          <button className="save-chat-btn" type="button" onClick={this.saveChatHistory}>Save chat</button>
         ) : (
-            ''
-          )}
+          ''
+        )}
         <div />
       </div>
     );
