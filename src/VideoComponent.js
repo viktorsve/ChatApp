@@ -16,10 +16,10 @@ class VideoComponent extends Component {
   }
 
   componentDidMount() {
-    const { token } = this.props;
+    const { token, roomName } = this.props;
 
     Video.connect(token, {
-      name: 'video'
+      name: roomName
     }).then(room => {
       this.setState({ room });
       room.on('participantConnected', participant => {
@@ -82,7 +82,8 @@ class VideoComponent extends Component {
 }
 
 VideoComponent.propTypes = {
-  token: PropTypes.string.isRequired
+  token: PropTypes.string.isRequired,
+  roomName: PropTypes.string.isRequired
 };
 
 export default VideoComponent;

@@ -8,8 +8,15 @@ const rooms = [{ name: 'general', owner: null }];
 const joinRoom = (socket, room) => {
   if (rooms.some(r => r.name === room)) {
     io.to(`${socket.id}`).emit('joined room', room);
+    const index = connectedUsers.findIndex(user => user.id === socket.id);
+    connectedUsers[index].room[0] = room;
+    io.emit('remove user', connectedUsers);
 
-    socket.leaveAll();
+    Object.keys(socket.rooms).forEach(key => {
+      if (socket.id !== key) {
+        socket.leave(key);
+      }
+    });
     socket.join(room);
   }
 };
@@ -34,8 +41,12 @@ io.on('connection', socket => {
     messageId += 1;
   });
   socket.on('add user', username => {
-    const connectedUser = { id: socket.id, username, userColor: socket.color };
+    const room = Object.keys(io.sockets.adapter.sids[socket.id]).filter(item => item !== socket.id);
+    const connectedUser = {
+      id: socket.id, username, userColor: socket.color, room
+    };
     connectedUsers.push(connectedUser);
+
     io.emit('update userlist', connectedUsers);
     console.log(connectedUsers);
   });
