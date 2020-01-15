@@ -5,6 +5,30 @@ const messages = []; // Limit the size in future maybe
 let connectedUsers = [];
 const rooms = [{ name: 'general', owner: null }];
 
+const sendMessage = (socket, message) => {
+  if (message.room) {
+    const messageObject = {
+      type: 'user',
+      id: messageId,
+      user: message.username,
+      value: message.value,
+      sentAt: new Date().toLocaleTimeString(),
+      userColor: socket.color
+    };
+    messages.push(messageObject);
+
+    io.to(message.room).emit('message', messageObject);
+    messageId += 1;
+  } else {
+    const messageObject = {
+      type: 'system',
+      value: message
+    };
+
+    io.to(`${socket.id}`).emit('message', messageObject);
+  }
+};
+
 const joinRoom = (socket, room) => {
   if (rooms.some(r => r.name === room)) {
     io.to(`${socket.id}`).emit('joined room', room);
@@ -17,6 +41,8 @@ const joinRoom = (socket, room) => {
         socket.leave(key);
       }
     });
+
+    sendMessage(socket, `Joined room ${room}`);
     socket.join(room);
   }
 };
@@ -28,18 +54,7 @@ io.on('connection', socket => {
   io.to(`${socket.id}`).emit('message history', messages);
   io.emit('update roomlist', rooms);
   socket.on('message', message => {
-    const messageObject = {
-      id: messageId,
-      user: message.username,
-      value: message.value,
-      sentAt: new Date().toLocaleTimeString(),
-      userColor: socket.color
-    };
-    messages.push(messageObject);
-    console.log(messageObject);
-    console.log(`to room ${message.room}`);
-    io.to(message.room).emit('message', messageObject);
-    messageId += 1;
+    sendMessage(socket, message);
   });
   socket.on('add user', username => {
     const room = Object.keys(io.sockets.adapter.sids[socket.id]).filter(item => item !== socket.id);
