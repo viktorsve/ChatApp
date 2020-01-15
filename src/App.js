@@ -267,16 +267,22 @@ class App extends Component {
                 </ul>
                 <ul>
                   {messages.map(message => (
-                    <li className="chatMessage" key={message.id}>
-                      <span className="timestamp">{`[${message.sentAt}] `}</span>
-                      <span
-                        style={{ color: `hsl(${message.userColor}, 50%, 50%)` }}
-                      >
-                        {`${message.user}`}
+                    message.type === 'user' ? (
+                      <li className="chatMessage" key={message.id}>
+                        <span className="timestamp">{`[${message.sentAt}] `}</span>
+                        <span
+                          style={{ color: `hsl(${message.userColor}, 50%, 50%)` }}
+                        >
+                          {`${message.user}`}
 
-                      </span>
-                      {`: ${message.value}`}
-                    </li>
+                        </span>
+                        {`: ${message.value}`}
+                      </li>
+                    ) : (
+                      <li className="chatMessage">
+                        {message.value}
+                      </li>
+                    )
                   ))}
                 </ul>
               </>
