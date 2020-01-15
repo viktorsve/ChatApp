@@ -270,6 +270,8 @@ class App extends Component {
                 <ul>
                   <li>/join video chat</li>
                   <li>/leave video chat</li>
+                  <li>/create room</li>
+                  <li>/join room</li>
                 </ul>
                 <ul>
                   {messages.map(message => (
