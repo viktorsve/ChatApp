@@ -106,8 +106,8 @@ input:focus {
   cursor: pointer;
 }
 
-.save-chat-btn{
-  position: absolute;
+.save-chat-btn {
+  position: fixed;
   bottom: 0;
   right: 0;
 }

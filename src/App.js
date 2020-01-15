@@ -55,8 +55,15 @@ class App extends Component {
     socket.on('update userlist', connectedUsers => {
       this.setState({ connectedUsers });
     });
+    socket.on('remove user', connectedUsers => {
+      const { room } = this.state;
+      const filteredUsers = connectedUsers.filter(e => e.room[0] === room);
+
+      this.setState({ connectedUsers: filteredUsers });
+    });
     socket.on('user is writing', username => {
       const { typingUser } = this.state;
+
       const doesUserExist = typingUser.includes(username);
       if (doesUserExist === false) {
         typingUser.push(username);
@@ -65,12 +72,14 @@ class App extends Component {
     });
     socket.on('stopped typing message', username => {
       let { typingUser } = this.state;
+
       typingUser = typingUser.filter(e => e !== username);
       this.setState({ typingUser });
     });
 
     socket.on('joined room', room => {
       this.setState({ room });
+      this.clearToken();
     });
   }
 
@@ -83,11 +92,11 @@ class App extends Component {
   }
 
   async getToken() {
-    const { username } = this.state;
+    const { username, room } = this.state;
 
     const postData = JSON.stringify({
       identity: username,
-      room: 'video'
+      room
     });
 
     const axiosConfig = {
@@ -143,6 +152,7 @@ class App extends Component {
     } else if (creatingRoom === true) {
       socket.emit('create room', { username, value });
       this.setState({ creatingRoom: false });
+      this.clearToken();
     } else if (joiningRoom === true) {
       socket.emit('join room', { username, value });
       this.setState({ joiningRoom: false });
@@ -165,12 +175,16 @@ class App extends Component {
 
   handleTyping() {
     const { username } = this.state;
-    socket.emit('user is writing', username);
-    setTimeout(this.stoppedTyping, 4000);
+
+    if (username) {
+      socket.emit('user is writing', username);
+    }
+    setTimeout(this.stoppedTyping, 1000);
   }
 
   stoppedTyping() {
     const { username } = this.state;
+
     socket.emit('stopped typing message', username);
   }
 
@@ -212,7 +226,8 @@ class App extends Component {
       newMessages,
       typingUser,
       creatingRoom,
-      joiningRoom
+      joiningRoom,
+      room
     } = this.state;
 
     let inputText;
@@ -230,7 +245,11 @@ class App extends Component {
         {inputText}
         <input ref={input => { this.input = input; }} type="text" value={value} onChange={e => { this.handleChange(e); this.handleTyping(); }} />
         <input type="submit" />
-        <p>{typingUser.length !== 0 ? `${typingUser} is typing` : ''}</p>
+        <p>
+          {username !== '' && connectedUsers.some(e => e.username === typingUser[0])
+            ? `${typingUser} is typing`
+            : ''}
+        </p>
       </form>
     );
 
@@ -246,29 +265,34 @@ class App extends Component {
                   <li>/join video chat</li>
                   <li>/leave video chat</li>
                 </ul>
+                <ul>
+                  {messages.map(message => (
+                    <li className="chatMessage" key={message.id}>
+                      <span className="timestamp">{`[${message.sentAt}] `}</span>
+                      <span
+                        style={{ color: `hsl(${message.userColor}, 50%, 50%)` }}
+                      >
+                        {`${message.user}`}
+
+                      </span>
+                      {`: ${message.value}`}
+                    </li>
+                  ))}
+                </ul>
               </>
             )}
-            <ul>
-              {messages.map(message => (
-                <li className="chatMessage" key={message.id}>
-                  <span className="timestamp">{`[${message.sentAt}] `}</span>
-                  <span
-                    style={{ color: `hsl(${message.userColor}, 50%, 50%)` }}
-                  >
-                    {`${message.user}`}
-
-                  </span>
-                  {`: ${message.value}`}
-                </li>
-              ))}
-            </ul>
 
             {form}
           </div>
-          {connectedUsers[0] ? (
+          {connectedUsers[0] && username !== '' ? (
             <div className="user-list">
               <ul>
-                <li>Connected users:</li>
+                <li>
+                  Connected users in
+                  {' '}
+                  {room}
+                  :
+                </li>
                 {connectedUsers.map(connectedUser => (
                   <li style={{ color: `hsl(${connectedUser.userColor}, 50%, 50%)` }} key={connectedUser.id}>{connectedUser.username}</li>
                 ))}
@@ -276,7 +300,7 @@ class App extends Component {
             </div>
           ) : ''}
           {token ? (
-            <VideoComponent token={token} />
+            <VideoComponent token={token} roomName={room} />
           ) : (
             ''
           )}
