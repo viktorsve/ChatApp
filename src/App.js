@@ -21,7 +21,8 @@ class App extends Component {
       typingUser: [],
       creatingRoom: false,
       joiningRoom: false,
-      room: 'general'
+      room: 'general',
+      rooms: []
     };
 
     this.focusInput = this.focusInput.bind(this);
@@ -80,6 +81,10 @@ class App extends Component {
     socket.on('joined room', room => {
       this.setState({ room });
       this.clearToken();
+    });
+
+    socket.on('update roomlist', rooms => {
+      this.setState({ rooms });
     });
   }
 
@@ -227,7 +232,8 @@ class App extends Component {
       typingUser,
       creatingRoom,
       joiningRoom,
-      room
+      room,
+      rooms
     } = this.state;
 
     let inputText;
@@ -285,7 +291,7 @@ class App extends Component {
             {form}
           </div>
           {connectedUsers[0] && username !== '' ? (
-            <div className="user-list">
+            <div className="info-list">
               <ul>
                 <li>
                   Connected users in
@@ -295,6 +301,14 @@ class App extends Component {
                 </li>
                 {connectedUsers.map(connectedUser => (
                   <li style={{ color: `hsl(${connectedUser.userColor}, 50%, 50%)` }} key={connectedUser.id}>{connectedUser.username}</li>
+                ))}
+              </ul>
+              <ul className="mt-20">
+                <li>
+                  Available rooms:
+                </li>
+                {rooms.map(availRoom => (
+                  <li key={availRoom.name}>{availRoom.name}</li>
                 ))}
               </ul>
             </div>

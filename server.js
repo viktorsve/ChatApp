@@ -26,6 +26,7 @@ io.on('connection', socket => {
   socket.color = Math.floor(Math.random() * 255); // eslint-disable-line no-param-reassign
   console.log('a user connected');
   io.to(`${socket.id}`).emit('message history', messages);
+  io.emit('update roomlist', rooms);
   socket.on('message', message => {
     const messageObject = {
       id: messageId,
@@ -56,6 +57,7 @@ io.on('connection', socket => {
       console.log(rooms);
 
       joinRoom(socket, room.value);
+      io.emit('update roomlist', rooms);
     }
   });
   socket.on('join room', room => {
