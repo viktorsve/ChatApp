@@ -1,3 +1,8 @@
+/*
+* This is the socket.io server.
+* It handles all the data sent between sockets.
+*/
+
 const io = require('socket.io')();
 
 let messageId = 1;
@@ -50,7 +55,6 @@ const joinRoom = (socket, room) => {
 io.on('connection', socket => {
   socket.join('general');
   socket.color = Math.floor(Math.random() * 255); // eslint-disable-line no-param-reassign
-  console.log('a user connected');
   io.to(`${socket.id}`).emit('message history', messages);
   io.emit('update roomlist', rooms);
   socket.on('message', message => {
@@ -64,12 +68,10 @@ io.on('connection', socket => {
     connectedUsers.push(connectedUser);
 
     io.emit('update userlist', connectedUsers);
-    console.log(connectedUsers);
   });
   socket.on('create room', room => {
     if (rooms.filter(r => r.name === room.value).length === 0) {
       rooms.push({ name: room.value, owner: room.username });
-      console.log(rooms);
 
       joinRoom(socket, room.value);
       io.emit('update roomlist', rooms);
@@ -79,7 +81,6 @@ io.on('connection', socket => {
     joinRoom(socket, room.value);
   });
   socket.on('disconnect', () => {
-    console.log('user disconnected');
     const updatedUserList = connectedUsers.filter((id) => id.id !== socket.id);
     connectedUsers = updatedUserList;
     io.emit('update userlist', connectedUsers);

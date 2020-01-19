@@ -7,6 +7,13 @@ import VideoComponent from './VideoComponent';
 
 const socket = openSocket('http://localhost:8000');
 
+/*
+* Main Component.
+* Handles basically everything except the video chat.
+* (Message feed, Input field, Room logic, Connected users, etc.)
+* TODO: SPLIT INTO COMPONENTS
+*/
+
 class App extends Component {
   constructor(props) {
     super(props);
