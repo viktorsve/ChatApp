@@ -117,12 +117,8 @@ class App extends Component {
       }
     };
 
-    try {
-      const res = await axios.post('/video/token', postData, axiosConfig);
-      this.setState({ token: res.data.token });
-    } catch (error) {
-      console.error(error);
-    }
+    const res = await axios.post('/video/token', postData, axiosConfig);
+    this.setState({ token: res.data.token });
   }
 
   clearToken() {

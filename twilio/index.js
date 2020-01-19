@@ -1,3 +1,8 @@
+/*
+* This is the Koa backend server used for the twilio video chat.
+* Contains routes for accessing tokens.
+*/
+
 const Koa = require('koa');
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');

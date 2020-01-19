@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-/* This component is used for handling video and audio tracks that belong to users in the chat room.
-Will also manipulate the DOM and add the tracks to the corresponding HTML elements */
+/*
+* This component is used for handling video and audio tracks that belong to users in the chat room.
+* Will also manipulate the DOM and add the tracks to the corresponding HTML elements
+*/
+
 class ParticipantComponent extends Component {
   constructor(props) {
     super(props);

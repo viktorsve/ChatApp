@@ -1,3 +1,5 @@
+// Will create access tokens that is used when connecting to twilio video chat.
+
 const twilio = require('twilio');
 
 const { AccessToken } = twilio.jwt;

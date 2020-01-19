@@ -3,8 +3,11 @@ import Video from 'twilio-video';
 import PropTypes from 'prop-types';
 import ParticipantComponent from './ParticipantComponent';
 
-/* Component is used for connecting to the twilio video chat room using a JWT token.
-Also stores a list of all users that are connected to the chat room. */
+/*
+* Component is used for connecting to the twilio video chat room using a JWT token.
+* Also stores a list of all users that are connected to the chat room.
+*/
+
 class VideoComponent extends Component {
   constructor(props) {
     super(props);

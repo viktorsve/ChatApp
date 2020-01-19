@@ -1,3 +1,5 @@
+// Environment variables used for connecting to twilio.
+
 module.exports = {
   twilio: {
     accountSid: process.env.TWILIO_ACCOUNT_SID,
